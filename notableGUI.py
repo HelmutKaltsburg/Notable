@@ -126,14 +126,26 @@ class Application(tk.Frame):
             pass
 
     def remove_note(self):
-        db.remove(self.selected_item[0])
-        self.clear_text()
-        self.populate_list()
+        btn_text = self.mark_btn.cget('text')
+        if btn_text == "Mark As Done":
+            db.remove(self.selected_item[0])
+            self.clear_text()
+            self.populate_list()
+        if btn_text == "Unmark":
+            db.remove(self.selected_item[0])
+            self.clear_text()
+            self.populate_list_marked()
 
     def update_note(self):
-        self.note_date = str(datetime.datetime.today())
-        db.update(self.selected_item[0], self.author_text.get(), self.note_text.get(), self.note_date)
-        self.populate_list()
+        btn_text = self.mark_btn.cget('text')
+        if btn_text == "Mark As Done":
+            self.note_date = str(datetime.datetime.today())
+            db.update(self.selected_item[0], self.author_text.get(), self.note_text.get(), self.note_date)
+            self.populate_list()
+        if btn_text == "Unmark":
+            self.note_date = str(datetime.datetime.today())
+            db.update(self.selected_item[0], self.author_text.get(), self.note_text.get(), self.note_date)
+            self.populate_list_marked()
 
     def clear_text(self):
         self.author_entry.delete(0, tk.END)
