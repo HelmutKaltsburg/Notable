@@ -14,7 +14,7 @@ class Application(tk.Frame):
         self.master = master
         master.title('Notable')
         # Width and Height
-        master.geometry("550x350")
+        master.geometry("800x350")
         # Create widgets grid
         self.create_widgets()
         # Initialize selected item variable
@@ -50,6 +50,12 @@ class Application(tk.Frame):
         self.clear_btn = tk.Button(self.master, text="Clear Input", width=12, command=self.clear_text)
         self.clear_btn.grid(row=2, column=3)
 
+        self.mark_btn = tk.Button(self.master, text="Mark As Done", width=12, command=self.mark_note)
+        self.mark_btn.grid(row=2, column=4)
+
+        self.show_marked_btn = tk.Button(self.master, text="Show Marked", width=12, command=self.show_marked_note)
+        self.show_marked_btn.grid(row=2, column=5)
+
         # Notes List
         self.note_list = tk.Listbox(self.master, height=8, width=50, border=0)
         self.note_list.grid(row=3, column=0, columnspan=3, rowspan=6, pady=20, padx=20)
@@ -75,6 +81,14 @@ class Application(tk.Frame):
         self.note_list.delete(0, tk.END)
         # Loop through database table
         for row in db.fetch():
+            # Insert into list
+            self.note_list.insert(tk.END, row)
+
+    def populate_list_marked(self):
+        # Delete items in the list before updating
+        self.note_list.delete(0, tk.END)
+        # Loop through database table
+        for row in db.fetch_marked():
             # Insert into list
             self.note_list.insert(tk.END, row)
 
@@ -124,6 +138,30 @@ class Application(tk.Frame):
     def clear_text(self):
         self.author_entry.delete(0, tk.END)
         self.note_entry.delete(0, tk.END)
+
+    def mark_note(self):
+        btn_text = self.mark_btn.cget('text')
+        if btn_text == "Mark As Done":
+            db.mark(self.selected_item[0])
+            self.clear_text()
+            self.populate_list()
+        if btn_text == "Unmark":
+            db.unmark(self.selected_item[0])
+            self.clear_text()
+            self.populate_list_marked()
+
+    def show_marked_note(self):
+        btn_text = self.show_marked_btn.cget('text')
+        if btn_text == "Show Marked":
+            self.clear_text()
+            self.populate_list_marked()
+            self.show_marked_btn.config(text='Show Unmarked')
+            self.mark_btn.config(text='Unmark')
+        if btn_text == "Show Unmarked":
+            self.clear_text()
+            self.populate_list()
+            self.show_marked_btn.config(text='Show Marked')
+            self.mark_btn.config(text='Mark As Done')
 
 
 root = tk.Tk()
